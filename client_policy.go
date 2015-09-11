@@ -15,57 +15,65 @@
 package aerospike
 
 import (
-	"time"
+    "time"
 )
 
 const defaultIdleTimeout = 14 * time.Second
 
 // ClientPolicy encapsulates parameters for client policy command.
 type ClientPolicy struct {
-	// User authentication to cluster. Leave empty for clusters running without restricted access.
-	User string
+    // User authentication to cluster. Leave empty for clusters running without restricted access.
+    User string
 
-	// Password authentication to cluster. The password will be stored by the client and sent to server
-	// in hashed format. Leave empty for clusters running without restricted access.
-	Password string
+    // Password authentication to cluster. The password will be stored by the client and sent to server
+    // in hashed format. Leave empty for clusters running without restricted access.
+    Password string
 
-	// Initial host connection timeout in milliseconds.  The timeout when opening a connection
-	// to the server host for the first time.
-	Timeout time.Duration //= 1 second
+    // Initial host connection timeout in milliseconds.  The timeout when opening a connection
+    // to the server host for the first time.
+    Timeout time.Duration //= 1 second
 
-	// Connection idle timeout. Every time a connection is used, its idle
-	// deadline will be extended by this duration. When this deadline is reached,
-	// the connection will be closed and discarded from the connection pool.
-	IdleTimeout time.Duration //= 14 seconds
+    // Connection idle timeout. Every time a connection is used, its idle
+    // deadline will be extended by this duration. When this deadline is reached,
+    // the connection will be closed and discarded from the connection pool.
+    IdleTimeout time.Duration //= 14 seconds
 
-	// Size of the Connection Queue cache.
-	ConnectionQueueSize int //= 256
+    // Size of the Connection Queue cache.
+    ConnectionQueueSize int //= 256
 
-	// If set to true, will not create a new connection
-	// to the node if there are already `ConnectionQueueSize` active connections.
-	LimitConnectionsToQueueSize bool //= false
+    // If set to true, will not create a new connection
+    // to the node if there are already `ConnectionQueueSize` active connections.
+    LimitConnectionsToQueueSize bool //= false
 
-	// Throw exception if host connection fails during addHost().
-	FailIfNotConnected bool //= true
+    // Throw exception if host connection fails during addHost().
+    FailIfNotConnected bool //= true
 
-	// TendInterval determines interval for checking for cluster state changes.
-	// Minimum possible interval is 10 Miliseconds.
-	TendInterval time.Duration //= 1 second
+    // TendInterval determines interval for checking for cluster state changes.
+    // Minimum possible interval is 10 Miliseconds.
+    TendInterval time.Duration //= 1 second
+
+    // A IP translation table is used in cases where different clients
+    // use different server IP addresses.  This may be necessary when
+    // using clients from both inside and outside a local area
+    // network. Default is no translation.
+    // The key is the IP address returned from friend info requests to other servers.
+    // The value is the real IP address used to connect to the server.
+    IpMap map[string]string
 }
 
 // NewClientPolicy generates a new ClientPolicy with default values.
 func NewClientPolicy() *ClientPolicy {
-	return &ClientPolicy{
-		Timeout:                     time.Second,
-		IdleTimeout:                 defaultIdleTimeout,
-		ConnectionQueueSize:         256,
-		FailIfNotConnected:          true,
-		TendInterval:                time.Second,
-		LimitConnectionsToQueueSize: false,
-	}
+    return &ClientPolicy{
+        Timeout:                     time.Second,
+        IdleTimeout:                 defaultIdleTimeout,
+        ConnectionQueueSize:         256,
+        FailIfNotConnected:          true,
+        TendInterval:                time.Second,
+        LimitConnectionsToQueueSize: false,
+    }
 }
 
 // RequiresAuthentication returns true if a USer or Password is set for ClientPolicy.
 func (cp *ClientPolicy) RequiresAuthentication() bool {
-	return (cp.User != "") || (cp.Password != "")
+    return (cp.User != "") || (cp.Password != "")
 }
